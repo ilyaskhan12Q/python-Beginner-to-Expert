@@ -80,8 +80,8 @@ If you want to add a new lesson or make a substantial change, **open an issue fi
 # 1. Fork the repo on GitHub (click the Fork button)
 
 # 2. Clone YOUR fork
-git clone https://github.com/YOUR-USERNAME/python-Beginner-Friendly.git
-cd python-Beginner-Friendly
+git clone https://github.com/ilyaskhan12Q/python-Beginner-to-Expert.git
+cd python-Beginner-to-Expert
 
 # 3. Verify Python version
 python --version   # Must be 3.10+
