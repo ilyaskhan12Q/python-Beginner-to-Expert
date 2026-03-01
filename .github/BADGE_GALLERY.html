@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Badge Gallery — Python: Zero to OOP Hero</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #080c12;
+      --surface:     #0e1420;
+      --surface2:    #141c2c;
+      --border:      rgba(255,255,255,0.07);
+      --text:        #e2e8f0;
+      --muted:       #64748b;
+      --green:       #4ade80;
+      --purple:      #818cf8;
+      --gold:        #fbbf24;
+      --teal:        #2dd4bf;
+      --rose:        #fb7185;
+      --sky:         #38bdf8;
+      --lime:        #a3e635;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── GRID BACKGROUND ─────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(74,222,128,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74,222,128,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HERO ─────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 80px 24px 60px;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--green);
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border: 1px solid rgba(74,222,128,0.25);
+      border-radius: 100px;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff 30%, rgba(74,222,128,0.8));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    .hero-snake {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 20px;
+      animation: bob 3s ease-in-out infinite;
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+
+    /* ── SECTION ──────────────────────────────────────── */
+    .section {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .section-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .tag-progress    { background: rgba(74,222,128,0.12);  color: var(--green);  border: 1px solid rgba(74,222,128,0.2);  }
+    .tag-contribution{ background: rgba(56,189,248,0.12);  color: var(--sky);    border: 1px solid rgba(56,189,248,0.2);  }
+    .tag-topic       { background: rgba(129,140,248,0.12); color: var(--purple); border: 1px solid rgba(129,140,248,0.2); }
+    .tag-shield      { background: rgba(251,191,36,0.12);  color: var(--gold);   border: 1px solid rgba(251,191,36,0.2);  }
+
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* ── BADGE GRID ───────────────────────────────────── */
+    .badge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .badge-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .badge-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: 16px;
+    }
+
+    .badge-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .badge-card:hover::before { opacity: 1; }
+
+    /* color-coded glows per card */
+    .card-green  { --c: 74,222,128; }
+    .card-purple { --c: 129,140,248; }
+    .card-gold   { --c: 251,191,36; }
+    .card-teal   { --c: 45,212,191; }
+    .card-rose   { --c: 251,113,133; }
+    .card-sky    { --c: 56,189,248; }
+    .card-lime   { --c: 163,230,53; }
+
+    .badge-card:hover {
+      border-color: rgba(var(--c), 0.35);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(var(--c),0.15);
+    }
+    .badge-card::before {
+      background: radial-gradient(circle at 50% 0%, rgba(var(--c),0.08), transparent 70%);
+    }
+
+    .badge-preview {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .badge-preview img {
+      height: 48px;
+      filter: drop-shadow(0 4px 12px rgba(var(--c), 0.4));
+      transition: filter 0.3s ease, transform 0.3s ease;
+    }
+
+    .badge-card:hover .badge-preview img {
+      filter: drop-shadow(0 6px 20px rgba(var(--c), 0.6));
+      transform: scale(1.05);
+    }
+
+    .badge-name {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .badge-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .badge-criteria {
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+    }
+
+    .badge-criteria strong {
+      color: rgba(var(--c), 1);
+      display: block;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .badge-criteria ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .badge-criteria li::before {
+      content: '→ ';
+      color: rgba(var(--c), 0.6);
+    }
+
+    .copy-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 16px;
+      width: 100%;
+      padding: 9px 14px;
+      background: rgba(var(--c), 0.1);
+      border: 1px solid rgba(var(--c), 0.2);
+      border-radius: 8px;
+      color: rgba(var(--c), 1);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .copy-btn:hover   { background: rgba(var(--c), 0.18); }
+    .copy-btn:active  { transform: scale(0.97); }
+    .copy-btn.copied  { color: var(--green); border-color: var(--green); background: rgba(74,222,128,0.1); }
+
+    /* ── SHIELD SECTION ───────────────────────────────── */
+    .shield-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .shield-row {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .shield-row:hover {
+      border-color: rgba(var(--c,74,222,128), 0.3);
+      transform: translateX(4px);
+    }
+
+    .shield-img {
+      height: 22px;
+      flex-shrink: 0;
+      border-radius: 3px;
+    }
+
+    .shield-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .shield-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .shield-code {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .shield-copy {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: var(--muted);
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      font-family: 'Space Mono', monospace;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .shield-copy:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+    .shield-copy.copied { color: var(--green); border-color: var(--green); }
+
+    /* ── README SNIPPET ───────────────────────────────── */
+    .readme-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .readme-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+
+    .readme-dots { display: flex; gap: 6px; }
+    .readme-dots span {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .d1 { background: #ff5f57; }
+    .d2 { background: #febc2e; }
+    .d3 { background: #28c840; }
+
+    .readme-filename {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .readme-copy {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 12px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      cursor: pointer;
+      font-family: 'Space Mono', monospace;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .readme-copy:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+    .readme-copy.copied { color: var(--green); border-color: var(--green); }
+
+    pre {
+      padding: 24px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #94a3b8;
+      overflow-x: auto;
+    }
+
+    pre .cm  { color: var(--muted); }
+    pre .kw  { color: var(--purple); }
+    pre .str { color: var(--green); }
+    pre .url { color: var(--sky); text-decoration: underline; }
+    pre .hl  { color: var(--text); }
+
+    /* ── FOOTER ───────────────────────────────────────── */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 40px 24px 60px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* ── TOAST ────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface2);
+      border: 1px solid rgba(74,222,128,0.3);
+      color: var(--green);
+      padding: 12px 24px;
+      border-radius: 100px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 999;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 600px) {
+      .badge-grid { grid-template-columns: 1fr; }
+      .shield-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HERO ─────────────────────────────────────────────── -->
+<section class="hero">
+  <span class="hero-snake">🐍</span>
+  <div class="hero-eyebrow">python · zero to oop hero</div>
+  <h1>Badge Gallery &amp;<br>Recognition System</h1>
+  <p>Collect badges as you progress through lessons, contribute to the repo, and help the community grow.</p>
+</section>
+
+<!-- ── PROGRESS BADGES ──────────────────────────────────── -->
+<section class="section">
+  <div class="section-header">
+    <span class="section-tag tag-progress">Progress</span>
+    <span class="section-title">Learning Milestones</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="badge-grid">
+
+    <div class="badge-card card-green">
+      <div class="badge-preview">
+        <img src=".github/badges/badge-beginner.svg" alt="Beginner Badge"/>
+      </div>
+      <div class="badge-name">🌱 Beginner</div>
+      <div class="badge-desc">You've taken your first steps. Variables, types, loops — you've got this.</div>
+      <div class="badge-criteria">
+        <strong>How to earn</strong>
+        <ul>
+          <li>Complete lessons 01–03</li>
+          <li>Pass exercises ex_01, ex_02, ex_03</li>
+          <li>Open a PR with your solutions</li>
+        </ul>
+      </div>
+      <button class="copy-btn" onclick="copyMd('[![Beginner](https://img.shields.io/badge/Python-Beginner-4ade80?style=flat-square&logo=python&logoColor=white)](./lessons/01_variables.py)', this)">
+        📋 Copy Markdown
+      </button>
+    </div>
+
+    <div class="badge-card card-purple">
+      <div class="badge-preview">
+        <img src=".github/badges/badge-intermediate.svg" alt="Intermediate Badge"/>
+      </div>
+      <div class="badge-name">🔥 Intermediate</div>
+      <div class="badge-desc">Functions, collections, real logic. You're writing code that actually does things.</div>
+      <div class="badge-criteria">
+        <strong>How to earn</strong>
+        <ul>
+          <li>Complete lessons 04–05</li>
+          <li>Pass exercises ex_04, ex_05</li>
+          <li>Build the grade tracker mini-project</li>
+        </ul>
+      </div>
+      <button class="copy-btn" onclick="copyMd('[![Intermediate](https://img.shields.io/badge/Python-Intermediate-818cf8?style=flat-square&logo=python&logoColor=white)](./lessons/04_functions.py)', this)">
+        📋 Copy Markdown
+      </button>
+    </div>
+
+    <div class="badge-card card-gold">
+      <div class="badge-preview">
+        <img src=".github/badges/badge-oop-master.svg" alt="OOP Master Badge"/>
+      </div>
+      <div class="badge-name">🏆 OOP Master</div>
+      <div class="badge-desc">Classes, inheritance, encapsulation, magic methods. You think in objects now.</div>
+      <div class="badge-criteria">
+        <strong>How to earn</strong>
+        <ul>
+          <li>Complete lessons 06–09</li>
+          <li>Finish the Library System challenge</li>
+          <li>Build &amp; share your own OOP project</li>
+        </ul>
+      </div>
+      <button class="copy-btn" onclick="copyMd('[![OOP Master](https://img.shields.io/badge/OOP-Master-fbbf24?style=flat-square&logo=python&logoColor=black)](./lessons/06_intro_to_oop.py)', this)">
+        📋 Copy Markdown
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── CONTRIBUTION BADGES ──────────────────────────────── -->
+<section class="section">
+  <div class="section-header">
+    <span class="section-tag tag-contribution">Contribution</span>
+    <span class="section-title">Community Roles</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="badge-grid">
+
+    <div class="badge-card card-teal">
+      <div class="badge-preview">
+        <img src=".github/badges/badge-contributor.svg" alt="Contributor Badge"/>
+      </div>
+      <div class="badge-name">🤝 Contributor</div>
+      <div class="badge-desc">You improved the repo. Fixed something, added something, helped someone.</div>
+      <div class="badge-criteria">
+        <strong>How to earn</strong>
+        <ul>
+          <li>Have 1+ merged pull request</li>
+          <li>Follows contribution guidelines</li>
+          <li>Passes CI checks</li>
+        </ul>
+      </div>
+      <button class="copy-btn" onclick="copyMd('[![Contributor](https://img.shields.io/badge/Role-Contributor-2dd4bf?style=flat-square&logo=github&logoColor=white)](./CONTRIBUTING.md)', this)">
+        📋 Copy Markdown
+      </button>
+    </div>
+
+    <div class="badge-card card-rose">
+      <div class="badge-preview">
+        <img src=".github/badges/badge-bug-hunter.svg" alt="Bug Hunter Badge"/>
+      </div>
+      <div class="badge-name">🐛 Bug Hunter</div>
+      <div class="badge-desc">You found and fixed a bug. The code is cleaner because of you.</div>
+      <div class="badge-criteria">
+        <strong>How to earn</strong>
+        <ul>
+          <li>Report a valid, confirmed bug</li>
+          <li>Optionally: fix it in a PR</li>
+          <li>Include steps to reproduce</li>
+        </ul>
+      </div>
+      <button class="copy-btn" onclick="copyMd('[![Bug Hunter](https://img.shields.io/badge/Role-Bug_Hunter-fb7185?style=flat-square&logo=python&logoColor=white)](./CONTRIBUTING.md)', this)">
+        📋 Copy Markdown
+      </button>
+    </div>
+
+    <div class="badge-card card-sky">
+      <div class="badge-preview">
+        <img src=".github/badges/badge-first-pr.svg" alt="First PR Badge"/>
+      </div>
+      <div class="badge-name">🚀 First PR</div>
+      <div class="badge-desc">Your very first pull request. Every legend had one.</div>
+      <div class="badge-criteria">
+        <strong>How to earn</strong>
+        <ul>
+          <li>Open your first PR to this repo</li>
+          <li>Any valid contribution counts</li>
+          <li>Awarded automatically on merge</li>
+        </ul>
+      </div>
+      <button class="copy-btn" onclick="copyMd('[![First PR](https://img.shields.io/badge/Milestone-First_PR-38bdf8?style=flat-square&logo=github&logoColor=white)](./CONTRIBUTING.md)', this)">
+        📋 Copy Markdown
+      </button>
+    </div>
+
+    <div class="badge-card card-lime">
+      <div class="badge-preview">
+        <img src=".github/badges/badge-lesson-author.svg" alt="Lesson Author Badge"/>
+      </div>
+      <div class="badge-name">✍️ Lesson Author</div>
+      <div class="badge-desc">You wrote educational content that helps other learners. That's impactful.</div>
+      <div class="badge-criteria">
+        <strong>How to earn</strong>
+        <ul>
+          <li>Write &amp; PR a new lesson or exercise</li>
+          <li>Follows lesson format guidelines</li>
+          <li>Content reviewed and merged</li>
+        </ul>
+      </div>
+      <button class="copy-btn" onclick="copyMd('[![Lesson Author](https://img.shields.io/badge/Role-Lesson_Author-a3e635?style=flat-square&logo=python&logoColor=black)](./CONTRIBUTING.md)', this)">
+        📋 Copy Markdown
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── SHIELDS.IO BADGES ─────────────────────────────────── -->
+<section class="section">
+  <div class="section-header">
+    <span class="section-tag tag-shield">Shields.io</span>
+    <span class="section-title">Repository Status Badges</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="shield-grid">
+    <!-- Python version -->
+    <div class="shield-row card-green">
+      <img class="shield-img" src="https://img.shields.io/badge/Python-3.10%2B-4ade80?style=flat-square&logo=python&logoColor=white" alt="Python 3.10+"/>
+      <div class="shield-info">
+        <div class="shield-label">Python Version</div>
+        <div class="shield-code">![Python](https://img.shields.io/badge/Python-3.10%2B-...)</div>
+      </div>
+      <button class="shield-copy" onclick="copyMd('![Python](https://img.shields.io/badge/Python-3.10%2B-4ade80?style=flat-square&logo=python&logoColor=white)', this)">Copy</button>
+    </div>
+    <!-- License -->
+    <div class="shield-row card-sky">
+      <img class="shield-img" src="https://img.shields.io/badge/License-MIT-38bdf8?style=flat-square" alt="MIT License"/>
+      <div class="shield-info">
+        <div class="shield-label">MIT License</div>
+        <div class="shield-code">![License](https://img.shields.io/badge/License-MIT-38bdf8...)</div>
+      </div>
+      <button class="shield-copy" onclick="copyMd('![License](https://img.shields.io/badge/License-MIT-38bdf8?style=flat-square)', this)">Copy</button>
+    </div>
+    <!-- PRs welcome -->
+    <div class="shield-row card-teal">
+      <img class="shield-img" src="https://img.shields.io/badge/PRs-Welcome-2dd4bf?style=flat-square&logo=github&logoColor=white" alt="PRs Welcome"/>
+      <div class="shield-info">
+        <div class="shield-label">PRs Welcome</div>
+        <div class="shield-code">![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-...)</div>
+      </div>
+      <button class="shield-copy" onclick="copyMd('![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-2dd4bf?style=flat-square&logo=github&logoColor=white)', this)">Copy</button>
+    </div>
+    <!-- Beginner Friendly -->
+    <div class="shield-row card-purple">
+      <img class="shield-img" src="https://img.shields.io/badge/Level-Beginner%20Friendly-818cf8?style=flat-square" alt="Beginner Friendly"/>
+      <div class="shield-info">
+        <div class="shield-label">Beginner Friendly</div>
+        <div class="shield-code">![Level](https://img.shields.io/badge/Level-Beginner...)</div>
+      </div>
+      <button class="shield-copy" onclick="copyMd('![Level](https://img.shields.io/badge/Level-Beginner%20Friendly-818cf8?style=flat-square)', this)">Copy</button>
+    </div>
+    <!-- PEP8 -->
+    <div class="shield-row card-lime">
+      <img class="shield-img" src="https://img.shields.io/badge/Code%20Style-PEP8-a3e635?style=flat-square" alt="PEP8"/>
+      <div class="shield-info">
+        <div class="shield-label">Code Style: PEP8</div>
+        <div class="shield-code">![PEP8](https://img.shields.io/badge/Code%20Style-PEP8-...)</div>
+      </div>
+      <button class="shield-copy" onclick="copyMd('![PEP8](https://img.shields.io/badge/Code%20Style-PEP8-a3e635?style=flat-square)', this)">Copy</button>
+    </div>
+    <!-- Contributions -->
+    <div class="shield-row card-gold">
+      <img class="shield-img" src="https://img.shields.io/badge/Contributions-Open-fbbf24?style=flat-square&logo=github" alt="Contributions Open"/>
+      <div class="shield-info">
+        <div class="shield-label">Contributions Open</div>
+        <div class="shield-code">![Contributions](https://img.shields.io/badge/...)</div>
+      </div>
+      <button class="shield-copy" onclick="copyMd('![Contributions](https://img.shields.io/badge/Contributions-Open-fbbf24?style=flat-square&logo=github)', this)">Copy</button>
+    </div>
+  </div>
+</section>
+
+<!-- ── README SNIPPET ────────────────────────────────────── -->
+<section class="section">
+  <div class="section-header">
+    <span class="section-tag tag-topic">Snippet</span>
+    <span class="section-title">Paste into your README</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="readme-block">
+    <div class="readme-header">
+      <div class="readme-dots">
+        <span class="d1"></span><span class="d2"></span><span class="d3"></span>
+      </div>
+      <span class="readme-filename">README.md — badges section</span>
+      <button class="readme-copy" id="readmeCopyBtn" onclick="copyReadme(this)">Copy all</button>
+    </div>
+    <pre id="readmeSnippet"><span class="cm"><!-- Repository status badges --></span>
+<span class="hl">![Python](</span><span class="url">https://img.shields.io/badge/Python-3.10%2B-4ade80?style=flat-square&logo=python&logoColor=white</span><span class="hl">)</span>
+<span class="hl">![License](</span><span class="url">https://img.shields.io/badge/License-MIT-38bdf8?style=flat-square</span><span class="hl">)</span>
+<span class="hl">![PRs Welcome](</span><span class="url">https://img.shields.io/badge/PRs-Welcome-2dd4bf?style=flat-square&logo=github&logoColor=white</span><span class="hl">)</span>
+<span class="hl">![PEP8](</span><span class="url">https://img.shields.io/badge/Code%20Style-PEP8-a3e635?style=flat-square</span><span class="hl">)</span>
+<span class="hl">![Level](</span><span class="url">https://img.shields.io/badge/Level-Beginner%20Friendly-818cf8?style=flat-square</span><span class="hl">)</span>
+
+<span class="cm"><!-- Your personal progress badges (add as you earn them) --></span>
+<span class="kw">[![Beginner]</span><span class="hl">(</span><span class="url">https://img.shields.io/badge/Python-Beginner-4ade80?style=flat-square&logo=python&logoColor=white</span><span class="hl">)](./lessons/01_variables.py)</span>
+<span class="kw">[![Intermediate]</span><span class="hl">(</span><span class="url">https://img.shields.io/badge/Python-Intermediate-818cf8?style=flat-square&logo=python&logoColor=white</span><span class="hl">)](./lessons/04_functions.py)</span>
+<span class="kw">[![OOP Master]</span><span class="hl">(</span><span class="url">https://img.shields.io/badge/OOP-Master-fbbf24?style=flat-square&logo=python&logoColor=black</span><span class="hl">)](./lessons/06_intro_to_oop.py)</span></pre>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────── -->
+<footer>
+  <p>python-beginner-friendly · badge system · MIT license</p>
+  <p style="margin-top:8px; font-size:0.7rem;">click any Copy button to get the markdown snippet</p>
+</footer>
+
+<!-- ── TOAST ──────────────────────────────────────────────── -->
+<div class="toast" id="toast">✓ Copied to clipboard</div>
+
+<script>
+  function showToast() {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  async function copyMd(text, btn) {
+    try {
+      await navigator.clipboard.writeText(text);
+      const orig = btn.textContent;
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      showToast();
+      setTimeout(() => {
+        btn.textContent = orig;
+        btn.classList.remove('copied');
+      }, 2000);
+    } catch (e) {
+      btn.textContent = '⚠ Manual copy';
+    }
+  }
+
+  async function copyReadme(btn) {
+    const raw = `![Python](https://img.shields.io/badge/Python-3.10%2B-4ade80?style=flat-square&logo=python&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-38bdf8?style=flat-square)
+![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-2dd4bf?style=flat-square&logo=github&logoColor=white)
+![PEP8](https://img.shields.io/badge/Code%20Style-PEP8-a3e635?style=flat-square)
+![Level](https://img.shields.io/badge/Level-Beginner%20Friendly-818cf8?style=flat-square)
+
+[![Beginner](https://img.shields.io/badge/Python-Beginner-4ade80?style=flat-square&logo=python&logoColor=white)](./lessons/01_variables.py)
+[![Intermediate](https://img.shields.io/badge/Python-Intermediate-818cf8?style=flat-square&logo=python&logoColor=white)](./lessons/04_functions.py)
+[![OOP Master](https://img.shields.io/badge/OOP-Master-fbbf24?style=flat-square&logo=python&logoColor=black)](./lessons/06_intro_to_oop.py)`;
+    try {
+      await navigator.clipboard.writeText(raw);
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      showToast();
+      setTimeout(() => { btn.textContent = 'Copy all'; btn.classList.remove('copied'); }, 2000);
+    } catch (e) {
+      btn.textContent = '⚠ Manual copy';
+    }
+  }
+
+  // Stagger card entrance
+  const cards = document.querySelectorAll('.badge-card, .shield-row');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        e.target.style.animationDelay = `${i * 60}ms`;
+        e.target.classList.add('entered');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  cards.forEach(c => {
+    c.style.opacity = '0';
+    c.style.transform = 'translateY(20px)';
+    c.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(c);
+  });
+
+  // Trigger entered state
+  document.querySelectorAll('.badge-card, .shield-row').forEach(c => {
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        setTimeout(() => {
+          c.style.opacity = '1';
+          c.style.transform = '';
+        }, 0);
+        io.disconnect();
+      }
+    }, { threshold: 0.05 });
+    io.observe(c);
+  });
+</script>
+</body>
+</html>
