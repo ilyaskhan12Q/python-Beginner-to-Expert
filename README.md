@@ -9,7 +9,7 @@ Welcome! This repository teaches you Python from scratch — no jargon, no assum
 ## 🗺️ How This Repo Is Organized
 
 ```
-python-Beginner-Friendly/
+python-Beginner-to-Expert/
 │
 ├── lessons/               ← Learn concepts with examples (read + run these)
 │   ├── 01_variables.py
