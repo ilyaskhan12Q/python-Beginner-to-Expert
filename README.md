@@ -62,8 +62,8 @@ python --version   # Should show Python 3.10+
 
 **Step 2 — Clone this repo**
 ```bash
-git clone https://github.com/ilyaskhan12Q/python-Beginner-Friendly.git
-cd python-Beginner-Friendly
+git clone https://github.com/ilyaskhan12Q/python-Beginner-to-Expert.git
+cd python-Beginner-to-Expert
 ```
 
 **Step 3 — Run your first lesson**
