@@ -62,7 +62,7 @@ python --version   # Should show Python 3.10+
 
 **Step 2 — Clone this repo**
 ```bash
-git clone https://github.com/your-username/python-Beginner-Friendly.git
+git clone https://github.com/ilyaskhan12Q/python-Beginner-Friendly.git
 cd python-Beginner-Friendly
 ```
 
